@@ -17,7 +17,7 @@ class Maze:
     def __init__(self, rooms: dict['Room'], starting_room):
         """
         Takes in a dict of Room objects and a starting room.
-        Initializes str_chain, which will hold a chain of selected rooms for the maze (specifically, every second room from the list — explained below).
+        Initializes str_chain, which will hold a chain of selected rooms for the maze.
         """
         self.rooms = rooms
         self.starting_room = starting_room
@@ -25,46 +25,43 @@ class Maze:
 
     def generate_maze(self):
         """
-        Function to generate the layout of rooms
+        Function to generate the layout of rooms in a 3-column grid.
         """
-       
-        strt_line = [i for i in range(len(self.rooms)) if i % 3 == 0]
-        
-        for i, id in enumerate(strt_line):
-            current = self.rooms[id]
+        num_cols = 3
+        num_rows = len(self.rooms) // num_cols
 
-            # Connect vert
-            if i + 1 < len(strt_line):
-                down_room = self.rooms[strt_line[i + 1]]
-                current.connection(down_room, 'down')
-                down_room.connection(current, 'top')
+        for i, room in enumerate(self.rooms):
+            row = i // num_cols # gives row no
+            col = i % num_cols # gives col no
 
-            # Connect left
-            if id - 1 >= 0:
-                left_room = self.rooms[id - 1]
-                current.connection(left_room, 'left')
-                left_room.connection(current, 'right')
+            # Connect right 
+            if col < num_cols - 1 and (i + 1) < len(self.rooms):
+                right_room = self.rooms[i + 1]
+                room.connection(right_room, 'right')
+                right_room.connection(room, 'left')
 
-            # Connect right
-            if id + 1 < len(self.rooms):
-                right_room = self.rooms[id + 1]
-                current.connection(right_room, 'right')
-                right_room.connection(current, 'left')
-                
+            # Connect down 
+            if row < num_rows - 1 and (i + num_cols) < len(self.rooms):
+                down_room = self.rooms[i + num_cols]
+                room.connection(down_room, 'down')
+                down_room.connection(room, 'top')
+                    
             
     def draw_rooms(self):
         """
-        Method to print out the room in the format of a mini map
-        Then connects these rooms
-        Each room (except the last) connects to the one above it ('top')
-        Each room (except the first) connects to the one below it ('down')
+        Method to print out each room and its connections in a clear format.
         """
         for room in self.rooms:
-            print(f'Room {room.id} connections:')
-            for direction, connected_room in room.connects.items():
-                if connected_room:
-                    print(f'{direction} Room {connected_room.id}')
-            print()
+            if room.id % 3 == 1:  # middle column rooms
+                print(f'milf Room {room.id} connections:')
+                has_connection = False
+                for direction in ['left', 'right', 'top', 'down']:
+                    connected_room = room.connects.get(direction)
+                    if connected_room:
+                        print(f'{direction} = Room {connected_room.id}')
+                        has_connection = True
+                if not has_connection:
+                    print('  No connections')
 
 #Create Room
 
@@ -91,7 +88,7 @@ class Character:
 
 
 list_of_rooms = []
-for i in range(20):
+for i in range(10):
     room =  Room(i)
     list_of_rooms.append(room)
 maze = Maze(list_of_rooms, list_of_rooms[0])
