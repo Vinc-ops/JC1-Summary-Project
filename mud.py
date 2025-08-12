@@ -63,7 +63,7 @@ class Maze:
                 if not has_connection:
                     print('  No connections')
 
-#Create Room
+#Create Room 
 
 class Room:
     """
